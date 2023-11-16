@@ -24,7 +24,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     using Strings for uint256;
 
     // Mapping owner address to token count
-    // The order of _balances, _minFeem, _issuer must not be changed to pass validation of gas sponsor application
+    // The order of _balances, _minFee, _issuer must not be changed to pass validation of gas sponsor application
     mapping (address => uint256) private _balances;
     uint256 private _minFee;
     address private _issuer;
