@@ -29,7 +29,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     uint256 private _minFee;
     address private _issuer;
 
-    bool isAldreadyInit;
+    bool isAlreadyInit;
 
     // EIP 712
     bytes32 private _HASHED_NAME;
@@ -65,12 +65,12 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
      * @dev Init function called by child contract
      */
     function _init(string memory name_, string memory symbol_, address issuer_) internal {
-        require(!isAldreadyInit, "VRC725: Contract already init");
+        require(!isAlreadyInit, "VRC725: Contract already init");
         __ERC721_init(name_, symbol_);
         __EIP712_init(name_, "1");
 
-        _issuer = msg.sender;
-        isAldreadyInit = true;
+        _issuer = issuer_;
+        isAlreadyInit = true;
     }
 
     /**
