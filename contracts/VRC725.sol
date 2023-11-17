@@ -28,7 +28,8 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     // The order of _balances, _minFee, _issuer must not be changed to pass validation of gas sponsor application
     mapping (address => uint256) private _balances;
     uint256 private _minFee;
-    address private _issuer;
+    address private _owner;
+    address private _newOwner;
 
     bool isAlreadyInit;
 
@@ -61,17 +62,26 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
     event Fee(address indexed from, address indexed to, address indexed issuer, uint256 value);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     /**
      * @dev Init function called by child contract
      */
-    function _init(string memory name_, string memory symbol_, address issuer_) internal {
+    function __VRC725_init(string memory name_, string memory symbol_, address owner_) internal {
         require(!isAlreadyInit, "VRC725: Contract already init");
         __ERC721_init(name_, symbol_);
         __EIP712_init(name_, "1");
 
-        _issuer = issuer_;
+        _owner = owner_;
         isAlreadyInit = true;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(_owner == msg.sender, "VRC25: caller is not the owner");
+        _;
     }
 
     /**
@@ -98,8 +108,15 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     /**
      * @notice Owner of the token
      */
+    function owner() public view returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @notice Owner of the token
+     */
     function issuer() public view returns (address) {
-        return _issuer;
+        return _owner;
     }
 
     /**
@@ -633,6 +650,33 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
      * @notice Calculate fee needed to transfer `amount` of tokens.
      */
     function _estimateFee(uint256 value) internal view virtual returns (uint256);
+
+
+    /// ------------------------------------- Ownable -------------------------------------
+
+    /**
+     * @dev Accept the ownership transfer. This is to make sure that the contract is
+     * transferred to a working address
+     *
+     * Can only be called by the newly transfered owner.
+     */
+    function acceptOwnership() external {
+        require(msg.sender == _newOwner, "VRC25: only new owner can accept ownership");
+        address oldOwner = _owner;
+        _owner = _newOwner;
+        _newOwner = address(0);
+        emit OwnershipTransferred(oldOwner, _owner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     *
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) external virtual onlyOwner {
+        require(newOwner != address(0), "VRC25: new owner is the zero address");
+        _newOwner = newOwner;
+    }
 
     /// ------------------------------------- EIP-712 -------------------------------------
 
