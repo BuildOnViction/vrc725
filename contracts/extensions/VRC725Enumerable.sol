@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.6.2;
 
-import "../vrc725/VRC725.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
+import "../interfaces/IERC721Enumerable.sol";
+import "../VRC725.sol";
 
 /**
  * @dev This implements an optional extension of {VRC725} defined that adds

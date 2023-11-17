@@ -1,7 +1,7 @@
-// SPDX-License-Identifier: Apache-2.0
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.6.2;
 
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "./IERC165.sol";
 
 ///
 /// @dev Interface for token permits for ERC-725

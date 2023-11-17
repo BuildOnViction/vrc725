@@ -1,18 +1,19 @@
-// SPDX-License-Identifier: Apache-2.0
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.6.2;
 
-import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import {Context} from "@openzeppelin/contracts/utils/Context.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {IERC165, ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import {IERC4494} from "./interfaces/IERC4494.sol";
+import {IERC721} from "./interfaces/IERC721.sol";
+import {IERC721Receiver} from "./interfaces/IERC721Receiver.sol";
+import {IERC721Metadata} from "./interfaces/IERC721Metadata.sol";
+import {IERC165} from "./interfaces/IERC165.sol";
 
-import '@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol';
-import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
-import "@openzeppelin/contracts/utils/Address.sol";
-
-import "../interfaces/IERC4494.sol";
+import "./libraries/SignatureChecker.sol";
+import "./libraries/ECDSA.sol";
+import "./libraries/Address.sol";
+import "./libraries/Context.sol";
+import "./libraries/Address.sol";
+import "./libraries/ERC165.sol";
+import "./libraries/Strings.sol";
 
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, including
@@ -115,6 +116,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
         return
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
+            interfaceId == type(IERC4494).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
@@ -175,7 +177,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
         require(deadline >= block.timestamp, 'CustomERC721: Permit deadline expired');
         bytes32 digest = _getPermitDigest(spender, tokenId, _nonces[tokenId], deadline);
 
-        (address recoverAddress, ) = ECDSA.tryRecover(digest, signature);
+        (address recoverAddress,, ) = ECDSA.tryRecover(digest, signature);
         require(
             // if the recovered address is owner or approved on token id,
             recoverAddress != address(0)
