@@ -44,7 +44,14 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
             'Permit(address spender,uint256 tokenId,uint256 nonce,uint256 deadline)'
         );
 
+    // Permit for all type hash using for EIP712
+    bytes32 public constant PERMIT_FOR_ALL_TYPEHASH =
+        keccak256(
+            'PermitForAll(address spender,uint256 nonce,uint256 deadline)'
+        );
+
     mapping(uint256 => uint256) private _nonces;
+    mapping(address => mapping(uint256 => bool)) private _noncesUsedByAddress;
 
     // Token name
     string private _name;
@@ -191,7 +198,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
      * @dev See {IERC4494-permit}.
      */
     function permit(address spender, uint256 tokenId, uint256 deadline, bytes memory signature) external override {
-        require(deadline >= block.timestamp, 'CustomERC721: Permit deadline expired');
+        require(deadline >= block.timestamp, 'VRC725: Permit deadline expired');
         bytes32 digest = _getPermitDigest(spender, tokenId, _nonces[tokenId], deadline);
 
         (address recoverAddress,, ) = ECDSA.tryRecover(digest, signature);
@@ -201,10 +208,30 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
                 && _isApprovedOrOwner(recoverAddress, tokenId)
                 // try to recover signature using SignatureChecker, which allows to recover signature made by contracts
                 || SignatureChecker.isValidSignatureNow(ownerOf(tokenId), digest, signature)
-            , "CustomERC721: Invalid permit signature"
+            , "VRC725: Invalid permit signature"
         );
 
         _approve(spender, tokenId);
+    }
+
+    /**
+     * @dev Permit for all
+     */
+    function permitForAll(address owner, address spender, uint256 nonce, uint256 deadline, bytes memory signature) external {
+        require(deadline >= block.timestamp, 'VRC725: Permit deadline expired');
+        require(!_noncesUsedByAddress[owner][nonce], "VRC725: Nonce used");
+        bytes32 digest = _getPermitForAllDigest(spender, nonce, deadline);
+
+        (address recoverAddress,, ) = ECDSA.tryRecover(digest, signature);
+        require(
+            // if the recovered address is owner,
+            recoverAddress == owner || SignatureChecker.isValidSignatureNow(owner, digest, signature)
+            , "VRC725: Invalid permit signature"
+        );
+
+        _setApprovalForAll(owner, spender, true);
+
+        _noncesUsedByAddress[owner][nonce] = true;
     }
 
     /**
@@ -625,6 +652,23 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     }
 
     /**
+     * @dev Builds the permit for all digest to sign
+     * @param spender the address to approve
+     * @param nonce the nonce to make a permit for
+     * @param deadline a timestamp expiry for the permit
+     */
+    function _getPermitForAllDigest(address spender, uint256 nonce, uint256 deadline) internal view returns (bytes32) {
+        return _hashTypedDataV4(
+            keccak256(abi.encode(
+                PERMIT_FOR_ALL_TYPEHASH,
+                spender,
+                nonce,
+                deadline
+            ))
+        );
+    }
+
+    /**
      * @dev Helper to easily increment a nonce for a given tokenId
      */
     function _incrementNonce(uint256 tokenId) internal {
@@ -644,6 +688,13 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     function nonces(uint256 tokenId) external view override returns(uint256) {
         require(_exists(tokenId), "ERC721: invalid token ID");
         return _nonces[tokenId];
+    }
+
+    /**
+     * @dev Is used nonce
+     */
+    function isUsedNonce(address owner, uint256 nonce) external view returns(bool) {
+        return _noncesUsedByAddress[owner][nonce];
     }
 
     /**
