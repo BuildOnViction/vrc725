@@ -87,7 +87,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyOwner() {
-        require(_owner == msg.sender, "VRC25: caller is not the owner");
+        require(_owner == msg.sender, "VRC725: caller is not the owner");
         _;
     }
 
@@ -712,7 +712,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
      * Can only be called by the newly transfered owner.
      */
     function acceptOwnership() external {
-        require(msg.sender == _newOwner, "VRC25: only new owner can accept ownership");
+        require(msg.sender == _newOwner, "VRC725: only new owner can accept ownership");
         address oldOwner = _owner;
         _owner = _newOwner;
         _newOwner = address(0);
@@ -725,7 +725,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
      * Can only be called by the current owner.
      */
     function transferOwnership(address newOwner) external virtual onlyOwner {
-        require(newOwner != address(0), "VRC25: new owner is the zero address");
+        require(newOwner != address(0), "VRC725: new owner is the zero address");
         _newOwner = newOwner;
     }
 
