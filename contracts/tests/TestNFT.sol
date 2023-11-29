@@ -8,10 +8,6 @@ contract TestNFT is VRC725Enumerable {
         __VRC725_init(name, symbol, issuer);
     }
 
-    function _estimateFee(uint256) internal view override returns (uint256) {
-        return minFee();
-    }
-
     function mint(address owner, uint256 tokenId) external onlyOwner {
         _safeMint(owner, tokenId);
     }

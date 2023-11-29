@@ -51,7 +51,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
         );
 
     mapping(uint256 => uint256) private _nonces;
-    mapping(address => mapping(uint256 => bool)) private _noncesUsedByAddress;
+    mapping(address => uint256) private _noncesByAddress;
 
     // Token name
     string private _name;
@@ -99,17 +99,6 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
         _symbol = symbol_;
 
         _minFee = 0;
-    }
-
-    /**
-     * @notice Calculate fee needed to transfer `amount` of tokens.
-     */
-    function estimateFee(uint256 value) public view returns (uint256) {
-        if (address(msg.sender).isContract()) {
-            return 0;
-        } else {
-            return _estimateFee(value);
-        }
     }
 
     /**
@@ -217,10 +206,9 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     /**
      * @dev Permit for all
      */
-    function permitForAll(address owner, address spender, uint256 nonce, uint256 deadline, bytes memory signature) external {
+    function permitForAll(address owner, address spender, uint256 deadline, bytes memory signature) external {
         require(deadline >= block.timestamp, 'VRC725: Permit deadline expired');
-        require(!_noncesUsedByAddress[owner][nonce], "VRC725: Nonce used");
-        bytes32 digest = _getPermitForAllDigest(spender, nonce, deadline);
+        bytes32 digest = _getPermitForAllDigest(spender, _noncesByAddress[owner], deadline);
 
         (address recoverAddress,, ) = ECDSA.tryRecover(digest, signature);
         require(
@@ -231,7 +219,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
 
         _setApprovalForAll(owner, spender, true);
 
-        _noncesUsedByAddress[owner][nonce] = true;
+        _noncesByAddress[owner]++;
     }
 
     /**
@@ -691,17 +679,11 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     }
 
     /**
-     * @dev Is used nonce
+     * @dev Find nonce by address
      */
-    function isUsedNonce(address owner, uint256 nonce) external view returns(bool) {
-        return _noncesUsedByAddress[owner][nonce];
+    function nonceByAddress(address owner) external view returns(uint256) {
+        return _noncesByAddress[owner];
     }
-
-    /**
-     * @notice Calculate fee needed to transfer `amount` of tokens.
-     */
-    function _estimateFee(uint256 value) internal view virtual returns (uint256);
-
 
     /// ------------------------------------- Ownable -------------------------------------
 
