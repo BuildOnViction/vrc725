@@ -6,6 +6,7 @@ import {IERC721} from "./interfaces/IERC721.sol";
 import {IERC721Receiver} from "./interfaces/IERC721Receiver.sol";
 import {IERC721Metadata} from "./interfaces/IERC721Metadata.sol";
 import {IERC165} from "./interfaces/IERC165.sol";
+import {IVRC725} from "./interfaces/IVRC725.sol";
 
 import "./libraries/SignatureChecker.sol";
 import "./libraries/ECDSA.sol";
@@ -20,7 +21,7 @@ import "./libraries/Strings.sol";
  * the Metadata extension, but not including the Enumerable extension, which is available separately as
  * {ERC721Enumerable}.
  */
-abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
+abstract contract VRC725 is ERC165, IVRC725 {
     using Address for address;
     using Strings for uint256;
 
@@ -217,7 +218,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     /**
      * @dev Permit for all
      */
-    function permitForAll(address owner, address spender, uint256 nonce, uint256 deadline, bytes memory signature) external {
+    function permitForAll(address owner, address spender, uint256 nonce, uint256 deadline, bytes memory signature) external override {
         require(deadline >= block.timestamp, 'VRC725: Permit deadline expired');
         require(!_noncesUsedByAddress[owner][nonce], "VRC725: Nonce used");
         bytes32 digest = _getPermitForAllDigest(spender, nonce, deadline);
@@ -693,7 +694,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     /**
      * @dev Is used nonce
      */
-    function isUsedNonce(address owner, uint256 nonce) external view returns(bool) {
+    function isUsedNonce(address owner, uint256 nonce) external view override returns(bool) {
         return _noncesUsedByAddress[owner][nonce];
     }
 
