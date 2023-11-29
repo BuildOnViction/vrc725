@@ -679,7 +679,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     }
 
     /**
-     * @dev Is used nonce
+     * @dev Find nonce by address
      */
     function nonceByAddress(address owner) external view returns(uint256) {
         return _noncesByAddress[owner];
