@@ -6,6 +6,7 @@ import {IERC721} from "./interfaces/IERC721.sol";
 import {IERC721Receiver} from "./interfaces/IERC721Receiver.sol";
 import {IERC721Metadata} from "./interfaces/IERC721Metadata.sol";
 import {IERC165} from "./interfaces/IERC165.sol";
+import {IVRC725} from "./interfaces/IVRC725.sol";
 
 import "./libraries/SignatureChecker.sol";
 import "./libraries/ECDSA.sol";
@@ -20,14 +21,14 @@ import "./libraries/Strings.sol";
  * the Metadata extension, but not including the Enumerable extension, which is available separately as
  * {ERC721Enumerable}.
  */
-abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
+abstract contract VRC725 is ERC165, IVRC725 {
     using Address for address;
     using Strings for uint256;
 
     // Mapping owner address to token count
     // The order of _balances, _minFee, _issuer must not be changed to pass validation of gas sponsor application
     mapping (address => uint256) private _balances;
-    uint256 private _minFee;
+    uint256 private _minFee; // minFee must always be 0 to ensure that VictionZ will work properly in the case you apply for it
     address private _owner;
     address private _newOwner;
 
@@ -130,6 +131,7 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
             interfaceId == type(IERC4494).interfaceId ||
+            interfaceId == type(IVRC725).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
