@@ -41,16 +41,16 @@ describe("VRC725 Helper Unittest", () => {
         const [owner, spender] = await ethers.getSigners()
         const signature = await signPermitForAll(owner, testNFT, spender.address, 0, 10000000000000)
 
-        await helper.permitForAll(await testNFT.getAddress(), owner.address, spender.address, 0, 10000000000000, signature)
+        await helper.permitForAll(await testNFT.getAddress(), owner.address, spender.address, 10000000000000, signature)
         expect(await testNFT.isApprovedForAll(owner.address, spender.address)).to.eq(true)
-        expect(await testNFT.isUsedNonce(owner.address, 0)).to.eq(true)
+        expect(await testNFT.nonceByAddress(owner.address)).to.eq(1)
     })
 
     it("Transfer though Helper", async () => {
         const [owner, receiver] = await ethers.getSigners()
         const signature = await signPermitForAll(owner, testNFT, await helper.getAddress(), 1, 10000000000000)
 
-        await helper.permitForAll(await testNFT.getAddress(), owner.address, await helper.getAddress(), 1, 10000000000000, signature)
+        await helper.permitForAll(await testNFT.getAddress(), owner.address, await helper.getAddress(), 10000000000000, signature)
         await helper.transferNFT(await testNFT.getAddress(), receiver.address, 1)
 
         expect(await testNFT.ownerOf(1)).to.eq(receiver.address)
@@ -63,7 +63,7 @@ describe("VRC725 Helper Unittest", () => {
         const signature = await signPermitForAll(owner, testNFT, await helper.getAddress(), 2, 10000000000000)
 
 
-        const permitData = helper.interface.encodeFunctionData("permitForAll", [await testNFT.getAddress(), owner.address, await helper.getAddress(), 2, 10000000000000, signature])
+        const permitData = helper.interface.encodeFunctionData("permitForAll", [await testNFT.getAddress(), owner.address, await helper.getAddress(), 10000000000000, signature])
         const transferData = helper.interface.encodeFunctionData("transferNFT", [await testNFT.getAddress(), receiver.address, 2])
         await helper.multicall([permitData, transferData])
         expect(await testNFT.ownerOf(2)).to.eq(receiver.address)

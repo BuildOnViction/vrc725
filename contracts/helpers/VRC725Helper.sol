@@ -19,11 +19,11 @@ contract VRC725Helper is VRC25 {
         VRC725(collection).permit(spender, tokenId, deadline, signature);
     }
 
-    function permitForAll(address collection, address owner, address spender, uint256 nonce, uint256 deadline, bytes memory signature) external {
+    function permitForAll(address collection, address owner, address spender, uint256 deadline, bytes memory signature) external {
         uint256 fee = estimateFee(0);
         _chargeFeeFrom(msg.sender, address(this), fee);
 
-        VRC725(collection).permitForAll(owner, spender, nonce, deadline, signature);
+        VRC725(collection).permitForAll(owner, spender, deadline, signature);
     }
 
     function transferNFT(address collection, address to, uint256 tokenId) external {

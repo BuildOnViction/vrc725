@@ -29,8 +29,8 @@ describe("VRC725 Basic Unittest", () => {
         const [owner, spender] = await ethers.getSigners()
         const signature = await signPermitForAll(owner, testNFT, spender.address, 0, 10000000000000)
 
-        await testNFT.permitForAll(owner.address, spender.address, 0, 10000000000000, signature)
+        await testNFT.permitForAll(owner.address, spender.address, 10000000000000, signature)
         expect(await testNFT.isApprovedForAll(owner.address, spender.address)).to.eq(true)
-        expect(await testNFT.isUsedNonce(owner.address, 0)).to.eq(true)
+        expect(await testNFT.nonceByAddress(owner.address)).to.eq(1)
     })
 })
