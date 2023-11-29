@@ -102,17 +102,6 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     }
 
     /**
-     * @notice Calculate fee needed to transfer `amount` of tokens.
-     */
-    function estimateFee(uint256 value) public view returns (uint256) {
-        if (address(msg.sender).isContract()) {
-            return 0;
-        } else {
-            return _estimateFee(value);
-        }
-    }
-
-    /**
      * @notice Owner of the token
      */
     function owner() public view returns (address) {
@@ -696,12 +685,6 @@ abstract contract VRC725 is ERC165, IERC721, IERC721Metadata, IERC4494 {
     function isUsedNonce(address owner, uint256 nonce) external view returns(bool) {
         return _noncesUsedByAddress[owner][nonce];
     }
-
-    /**
-     * @notice Calculate fee needed to transfer `amount` of tokens.
-     */
-    function _estimateFee(uint256 value) internal view virtual returns (uint256);
-
 
     /// ------------------------------------- Ownable -------------------------------------
 
