@@ -55,4 +55,17 @@ describe("VRC725 Helper Unittest", () => {
 
         expect(await testNFT.ownerOf(1)).to.eq(receiver.address)
     })
+
+    it("Multi call", async () => {
+        const [owner, receiver] = await ethers.getSigners()
+        await testNFT.mint(owner.address, 2)
+
+        const signature = await signPermitForAll(owner, testNFT, await helper.getAddress(), 2, 10000000000000)
+
+
+        const permitData = helper.interface.encodeFunctionData("permitForAll", [await testNFT.getAddress(), owner.address, await helper.getAddress(), 2, 10000000000000, signature])
+        const transferData = helper.interface.encodeFunctionData("transferNFT", [await testNFT.getAddress(), receiver.address, 2])
+        await helper.multicall([permitData, transferData])
+        expect(await testNFT.ownerOf(2)).to.eq(receiver.address)
+    })
 })
