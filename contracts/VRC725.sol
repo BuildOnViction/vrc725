@@ -142,6 +142,7 @@ abstract contract VRC725 is ERC165, IVRC725 {
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
             interfaceId == type(IERC4494).interfaceId ||
+            interfaceId == type(IVRC725).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
