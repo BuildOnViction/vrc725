@@ -5,8 +5,6 @@ import { expect } from "chai";
 import { TestNFT } from "../typechain-types"
 import { signPermitForAll } from "./shared/utils";
 
-
-
 const deployTestNFT = async (): Promise<TestNFT> => {
     const [owner] = await ethers.getSigners()
     const testNFT__factory = await ethers.getContractFactory("TestNFT")
