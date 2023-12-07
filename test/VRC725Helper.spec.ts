@@ -2,13 +2,13 @@ import { ethers } from "hardhat"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 
-import { TestNFT, VRC725Helper } from "../typechain-types"
+import { NFTMock, VRC725Helper } from "../typechain-types"
 import { signPermit, signPermitForAll } from "./shared/utils";
 
-const deployTestNFT = async (): Promise<[TestNFT, VRC725Helper]> => {
+const deployTestNFT = async (): Promise<[NFTMock, VRC725Helper]> => {
     const [owner] = await ethers.getSigners()
-    const testNFT__factory = await ethers.getContractFactory("TestNFT")
-    const testNFT: TestNFT = await testNFT__factory.deploy("Test NFT", "NFT", owner.address)
+    const testNFT__factory = await ethers.getContractFactory("NFTMock")
+    const testNFT: NFTMock = await testNFT__factory.deploy("Test NFT", "NFT", owner.address)
 
     const vrc725Helper__factory = await ethers.getContractFactory("VRC725Helper")
     const vrc725Helper: VRC725Helper = await vrc725Helper__factory.deploy("Helper", "HELPER", 0)
@@ -16,7 +16,7 @@ const deployTestNFT = async (): Promise<[TestNFT, VRC725Helper]> => {
 }
 
 describe("VRC725 Helper Unittest", () => {
-    let testNFT: TestNFT
+    let testNFT: NFTMock
     let helper: VRC725Helper
     before(async () => {
         [testNFT, helper] = await loadFixture(deployTestNFT)

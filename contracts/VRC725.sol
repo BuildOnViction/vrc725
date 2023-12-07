@@ -139,7 +139,7 @@ abstract contract VRC725 is ERC165, IVRC725 {
      * @dev See {IERC721-balanceOf}.
      */
     function balanceOf(address owner) public view virtual override returns (uint256) {
-        require(owner != address(0), "ERC721: address zero is not a valid owner");
+        require(owner != address(0), "VRC725: address zero is not a valid owner");
         return _balances[owner];
     }
 
@@ -148,7 +148,7 @@ abstract contract VRC725 is ERC165, IVRC725 {
      */
     function ownerOf(uint256 tokenId) public view virtual override returns (address) {
         address owner = _ownerOf(tokenId);
-        require(owner != address(0), "ERC721: invalid token ID");
+        require(owner != address(0), "VRC725: invalid token ID");
         return owner;
     }
 
@@ -229,11 +229,11 @@ abstract contract VRC725 is ERC165, IVRC725 {
      */
     function approve(address to, uint256 tokenId) public virtual override {
         address owner = VRC725.ownerOf(tokenId);
-        require(to != owner, "ERC721: approval to current owner");
+        require(to != owner, "VRC725: approval to current owner");
 
         require(
             msg.sender == owner || isApprovedForAll(owner, msg.sender),
-            "ERC721: approve caller is not token owner or approved for all"
+            "VRC725: approve caller is not token owner or approved for all"
         );
 
         _approve(to, tokenId);
@@ -271,7 +271,7 @@ abstract contract VRC725 is ERC165, IVRC725 {
         uint256 tokenId
     ) public virtual override {
         //solhint-disable-next-line max-line-length
-        require(_isApprovedOrOwner(msg.sender, tokenId), "ERC721: caller is not token owner or approved");
+        require(_isApprovedOrOwner(msg.sender, tokenId), "VRC725: caller is not token owner or approved");
 
         _transfer(from, to, tokenId);
     }
@@ -475,13 +475,13 @@ abstract contract VRC725 is ERC165, IVRC725 {
         address to,
         uint256 tokenId
     ) internal virtual {
-        require(VRC725.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
-        require(to != address(0), "ERC721: transfer to the zero address");
+        require(VRC725.ownerOf(tokenId) == from, "VRC725: transfer from incorrect owner");
+        require(to != address(0), "VRC725: transfer to the zero address");
 
         _beforeTokenTransfer(from, to, tokenId, 1);
 
         // Check that tokenId was not transferred by `_beforeTokenTransfer` hook
-        require(VRC725.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
+        require(VRC725.ownerOf(tokenId) == from, "VRC725: transfer from incorrect owner");
 
         // Clear approvals from the previous owner
         delete _tokenApprovals[tokenId];
@@ -525,7 +525,7 @@ abstract contract VRC725 is ERC165, IVRC725 {
         address operator,
         bool approved
     ) internal virtual {
-        require(owner != operator, "ERC721: approve to caller");
+        require(owner != operator, "VRC725: approve to caller");
         _operatorApprovals[owner][operator] = approved;
         emit ApprovalForAll(owner, operator, approved);
     }
@@ -534,7 +534,7 @@ abstract contract VRC725 is ERC165, IVRC725 {
      * @dev Reverts if the `tokenId` has not been minted yet.
      */
     function _requireMinted(uint256 tokenId) internal view virtual {
-        require(_exists(tokenId), "ERC721: invalid token ID");
+        require(_exists(tokenId), "VRC725: invalid token ID");
     }
 
     /**
@@ -676,7 +676,7 @@ abstract contract VRC725 is ERC165, IVRC725 {
      * @dev See {IERC4494-nonces}.
      */
     function nonces(uint256 tokenId) external view override returns(uint256) {
-        require(_exists(tokenId), "ERC721: invalid token ID");
+        require(_exists(tokenId), "VRC725: invalid token ID");
         return _nonces[tokenId];
     }
 
