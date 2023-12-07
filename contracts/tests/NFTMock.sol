@@ -3,7 +3,7 @@ pragma solidity >=0.6.2;
 
 import "../extensions/VRC725Enumerable.sol";
 
-contract TestNFT is VRC725Enumerable {
+contract NFTMock is VRC725Enumerable {
     constructor(string memory name, string memory symbol, address issuer) {
         __VRC725_init(name, symbol, issuer);
     }
